@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./routers/userRouter.js";
-import mysqlPool from "./database/db.js";
+import appointmentRouter from "./routers/appointmentRouter.js";
+import medicalRecordRouter from "./routers/medicalRecordRouter.js";
+import prescriptionRouter from "./routers/prescriptionRouter.js";
+import sequelize from "./database/db.js";
 
 const app = express();
 dotenv.config({ path: "./config/config.env" });
@@ -21,13 +24,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/medical", medicalRecordRouter);
+app.use("/api/v1/prescription", prescriptionRouter);
+app.use("/api/v1/appointment", appointmentRouter);
 
-mysqlPool.getConnection((err, connection) => {
-  if (err) {
-    console.log("Error connecting to database:", err);
-  }
-  console.log("Connected to the database");
-});
+try {
+  sequelize.authenticate();
+  console.log("Database connected Successfully");
+} catch (error) {
+  console.log("Error connecting with the database", error);
+}
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on PORT ${process.env.PORT}`);

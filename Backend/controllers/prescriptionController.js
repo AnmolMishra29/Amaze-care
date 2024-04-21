@@ -1,18 +1,100 @@
-import mysqlPool from "../database/db.js";
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
+import Prescriptions from "../models/prescriptionModel.js";
 
-export const createPrescription = catchAsyncError(async (req, res, next) => {});
+export const createPrescription = catchAsyncError(async (req, res, next) => {
+  const { RecordID, Medicine, Instructions, Dosage } = req.body;
 
-export const getAllPrescription = catchAsyncError(async (req, res, next) => {});
+  try {
+    await Prescriptions.sync();
+    const newPrescription = await Prescriptions.create({
+      RecordID: RecordID,
+      Medicine: Medicine,
+      Instructions: Instructions,
+      Dosage: Dosage,
+    });
 
-export const getAllPrescriptionID = catchAsyncError(
-  async (req, res, next) => {}
+    res.status(200).json({
+      success: true,
+      message: "Prescription created successfully",
+      newPrescription,
+    });
+  } catch (error) {
+    console.error("Error inserting Prescription:", error);
+  }
+});
+
+export const getAllPrescription = catchAsyncError(async (req, res, next) => {
+  try {
+    const allPrescriptions = await Prescriptions.findAll();
+
+    res.status(200).json({ success: true, Prescriptions: allPrescriptions });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, error: "Error fetching Prescriptions", error });
+  }
+});
+
+export const getAllPrescriptionByID = catchAsyncError(
+  async (req, res, next) => {
+    const prescriptionId = req.params.id;
+
+    try {
+      const prescription = await Prescriptions.findByPk(prescriptionId);
+
+      if (!prescription) {
+        return res
+          .status(404)
+          .json({ success: false, error: "prescription not found" });
+      }
+      res.status(200).json({ success: true, Prescriptions: prescription });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+  }
 );
 
-export const getAllPrescriptionRecordID = catchAsyncError(
-  async (req, res, next) => {}
+export const getAllPrescriptionByRecordID = catchAsyncError(
+  async (req, res, next) => {
+    const recordId = req.params.id;
+
+    try {
+      const prescription = await Prescriptions.findAll({
+        where: { RecordID: recordId },
+      });
+
+      if (!prescription) {
+        return res
+          .status(404)
+          .json({ success: false, error: "prescription not found" });
+      }
+      res.status(200).json({ success: true, prescription });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+  }
 );
 
 export const updatePrescription = catchAsyncError(async (req, res, next) => {});
 
-export const deletePrescription = catchAsyncError(async (req, res, next) => {});
+export const deletePrescription = catchAsyncError(async (req, res, next) => {
+  const prescriptionId = req.params.id;
+
+  try {
+    const prescription = await Prescriptions.findByPk(prescriptionId);
+
+    if (!prescription) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Prescription not found" });
+    }
+
+    await prescription.destroy();
+    res
+      .status(200)
+      .json({ success: true, message: "Prescription deleted succesfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});

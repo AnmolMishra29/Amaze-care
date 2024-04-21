@@ -1,7 +1,7 @@
 import express from "express";
 import {
   createMedicalRecord,
-  deleteMedicalRecord,
+  deleteMedicalRecordbyId,
   getAllMedicalRecord,
   getMedicalRecordByAppointmentID,
   getMedicalRecordByDoctorID,
@@ -10,13 +10,13 @@ import {
   updateMedicalRecord,
 } from "../controllers/medicalRecordController.js";
 
-import { isAuthorized } from "../middlewares/auth.js";
+import { isAuthorized, isDoctor, isPatient } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/createrecord", isAuthorized, createMedicalRecord);
+router.post("/createrecord", isDoctor, createMedicalRecord);
 router.get("/getallrecord", isAuthorized, getAllMedicalRecord);
-router.get("/getrecordbyid", isAuthorized, getMedicalRecordByID);
+router.get("/getrecordbyid/:id", isAuthorized, getMedicalRecordByID);
 router.get(
   "/getrecordbyappointmentid",
   isAuthorized,
@@ -24,7 +24,7 @@ router.get(
 );
 router.get("/getrecordbypatientid", isAuthorized, getMedicalRecordByPatientID);
 router.get("/getrecordbydoctorid", isAuthorized, getMedicalRecordByDoctorID);
-router.put("/updaterecord", isAuthorized, updateMedicalRecord);
-router.delete("/deleterecord", isAuthorized, deleteMedicalRecord);
+router.put("/updaterecord", isDoctor, updateMedicalRecord);
+router.delete("/deleterecord/:id", isDoctor, deleteMedicalRecordbyId);
 
 export default router;

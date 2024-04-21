@@ -3,20 +3,24 @@ import {
   createPrescription,
   deletePrescription,
   getAllPrescription,
-  getAllPrescriptionID,
-  getAllPrescriptionRecordID,
+  getAllPrescriptionByID,
+  getAllPrescriptionByRecordID,
   updatePrescription,
 } from "../controllers/prescriptionController.js";
 
-import { isAuthorized } from "../middlewares/auth.js";
+import { isAuthorized, isDoctor } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/doctorregister", isAuthorized, createPrescription);
-router.get("/doctorregister", isAuthorized, getAllPrescription);
-router.get("/doctorregister", isAuthorized, getAllPrescriptionID);
-router.get("/doctorregister", isAuthorized, getAllPrescriptionRecordID);
-router.update("/doctorregister", isAuthorized, updatePrescription);
-router.delete("/doctorregister", isAuthorized, deletePrescription);
+router.post("/createprescription", isDoctor, createPrescription);
+router.get("/getallprescription", isAuthorized, getAllPrescription);
+router.get("/getprescription/:id", isAuthorized, getAllPrescriptionByID);
+router.get(
+  "/getallprescriptionbyrecord/:id",
+  isAuthorized,
+  getAllPrescriptionByRecordID
+);
+router.put("/updateprescription", isDoctor, updatePrescription);
+router.delete("/deleteprescription/:id", isDoctor, deletePrescription);
 
 export default router;
