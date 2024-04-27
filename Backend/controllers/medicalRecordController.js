@@ -1,5 +1,6 @@
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import Records from "../models/medicalRecordModel.js";
+import Appointments from "../models/appointmentModel.js";
 
 export const createMedicalRecord = catchAsyncError(async (req, res, next) => {
   const {
@@ -65,10 +66,22 @@ export const getMedicalRecordByPatientID = catchAsyncError(
     const patientId = req.params.id;
 
     try {
-      const record = await Records.findAll({
-        where: { AppointmentID: appointmentId },
+      const appointments = await Appointments.findAll({
+        where: { PatientID: patientId },
       });
 
+      if (!appointments) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Medical Record not found" });
+      }
+      const appointmentIds = appointments.map(
+        (appointment) => appointment.AppointmentID
+      );
+
+      const record = await Records.findAll({
+        where: { AppointmentID: appointmentIds },
+      });
       if (!record) {
         return res
           .status(404)
@@ -82,7 +95,37 @@ export const getMedicalRecordByPatientID = catchAsyncError(
 );
 
 export const getMedicalRecordByDoctorID = catchAsyncError(
-  async (req, res, next) => {}
+  async (req, res, next) => {
+    const doctorId = req.params.id;
+
+    try {
+      const appointments = await Appointments.findAll({
+        where: { DoctorID: doctorId },
+      });
+
+      if (!appointments) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Medical Record not found" });
+      }
+      const appointmentIds = appointments.map(
+        (appointment) => appointment.AppointmentID
+      );
+
+      const record = await Records.findAll({
+        where: { AppointmentID: appointmentIds },
+      });
+      if (!record) {
+        return res
+          .status(404)
+          .json({ success: false, error: "Medical Record not found" });
+      }
+
+      res.status(200).json({ success: true, AllRecords: record });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Internal Server Error" });
+    }
+  }
 );
 
 export const getMedicalRecordByAppointmentID = catchAsyncError(

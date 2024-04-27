@@ -4,6 +4,7 @@ import Patients from "../models/patientModel.js";
 import Doctors from "../models/doctorModel.js";
 import bcrypt from "bcrypt";
 import { sendToken } from "../utils/jwtToken.js";
+import Admins from "../models/adminModel.js";
 
 export const patientregister = catchAsyncError(async (req, res, next) => {
   const {
@@ -85,6 +86,24 @@ export const login = catchAsyncError(async (req, res, next) => {
     } catch (error) {
       return next(new ErrorHandler("Error logging in", 500));
     }
+  } else if (UserRole === "Admin") {
+    try {
+      const user = await Admins.findOne({
+        where: { Email: Email } && { Passwordd: Passwordd },
+      });
+      if (!user) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+      }
+
+      //const passwordMatch = bcrypt.compareSync(Passwordd, user.Passwordd);
+
+      // if (!passwordMatch) {
+      //   return next(new ErrorHandler("Invalid email or password", 401));
+      // }
+      sendToken(user, 200, res, "Admin Login Successfully");
+    } catch (error) {
+      return next(new ErrorHandler("Error logging in", 500));
+    }
   } else {
     try {
       const user = await Doctors.findOne({ where: { Email: Email } });
@@ -115,4 +134,23 @@ export const logout = catchAsyncError(async (req, res, next) => {
       success: true,
       message: "User Logged Out Successfully",
     });
+});
+
+export const adminregister = catchAsyncError(async (req, res, next) => {
+  const { AdminName, Email, UserRole, Passwordd } = req.body;
+  const hashedPassword = bcrypt.hashSync(Passwordd, 10);
+
+  try {
+    const user = await Admins.create({
+      AdminName: AdminName,
+      Email: Email,
+      UserRole: UserRole,
+      Passwordd: hashedPassword,
+    });
+
+    console.log("Admin inserted successfully:", user.toJSON());
+    sendToken(user, 200, res, "Admin Registered Successfully");
+  } catch (error) {
+    console.error("Error adding Admin:", error);
+  }
 });

@@ -2,11 +2,17 @@ import jwt from "jsonwebtoken";
 
 export const sendToken = (user, statusCode, res, message) => {
   let token = "";
-  if (user.UserRole === "Patient") {
-    token = getJWTTokenforPatient(user.PatientID, user.Email);
-  } else {
-    token = getJWTTokenforDoctor(user.DoctorID, user.Email);
-  }
+  user.UserRole === "Patient"
+    ? (token = getJWTTokenforPatient(user.PatientID, user.Email))
+    : user.UserRole === "Doctor"
+    ? (token = getJWTTokenforDoctor(user.DoctorID, user.Email))
+    : getJWTTokenforAdmin(user.AdminID, user.Email);
+  // if (user.UserRole === "Patient") {
+  //   token = getJWTTokenforPatient(user.PatientID, user.Email);
+  // }
+  // else {
+  //   token = getJWTTokenforDoctor(user.DoctorID, user.Email);
+  // }
   //const token = getJWTToken(user.DoctorID, user.Email);
   //const token = user.getJWTToken();
   const options = {
@@ -37,6 +43,16 @@ const getJWTTokenforDoctor = (DoctorID, Email) => {
 const getJWTTokenforPatient = (PatientID, Email) => {
   return jwt.sign(
     { id: PatientID, email: Email, UserRole: "Patient" },
+    process.env.JWT_SECRET_KEY,
+    {
+      expiresIn: process.env.JWT_EXPIRE,
+    }
+  );
+};
+
+const getJWTTokenforAdmin = (AdminID, Email) => {
+  return jwt.sign(
+    { id: AdminID, email: Email, UserRole: "Admin" },
     process.env.JWT_SECRET_KEY,
     {
       expiresIn: process.env.JWT_EXPIRE,

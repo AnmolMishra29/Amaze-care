@@ -71,3 +71,30 @@ export const isPatient = catchAsyncError(async (req, res, next) => {
     next();
   });
 });
+
+export const isAdmin = catchAsyncError(async (req, res, next) => {
+  const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json({ error: "User not authorized" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+    if (err) {
+      console.error("Error verifying token:", err);
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    if (decoded.UserRole === "Patient" || decoded.UserRole === "Doctor") {
+      return res
+        .status(403)
+        .json({
+          error:
+            "Doctors and Patients are not allowed to use this functionality",
+        });
+    }
+
+    req.userId = decoded.userId;
+    next();
+  });
+});

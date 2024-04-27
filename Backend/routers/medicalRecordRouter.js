@@ -18,13 +18,21 @@ router.post("/createrecord", isDoctor, createMedicalRecord);
 router.get("/getallrecord", isAuthorized, getAllMedicalRecord);
 router.get("/getrecordbyid/:id", isAuthorized, getMedicalRecordByID);
 router.get(
-  "/getrecordbyappointmentid",
+  "/getrecordbyappointmentid/:id",
   isAuthorized,
   getMedicalRecordByAppointmentID
 );
-router.get("/getrecordbypatientid", isAuthorized, getMedicalRecordByPatientID);
-router.get("/getrecordbydoctorid", isAuthorized, getMedicalRecordByDoctorID);
-router.put("/updaterecord", isDoctor, updateMedicalRecord);
+router.get(
+  "/getrecordbypatientid/:id",
+  isAuthorized,
+  getMedicalRecordByPatientID
+);
+router.get(
+  "/getrecordbydoctorid/:id",
+  isAuthorized,
+  getMedicalRecordByDoctorID
+);
+router.put("/updaterecord/:id", isDoctor, updateMedicalRecord);
 router.delete("/deleterecord/:id", isDoctor, deleteMedicalRecordbyId);
 
 export default router;
