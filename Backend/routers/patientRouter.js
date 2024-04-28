@@ -13,6 +13,6 @@ const router = express.Router();
 router.get("/getallpatients", isAuthorized, getAllPatients);
 router.get("/getpatientbyid/:id", isAuthorized, getPatientById);
 router.get("/getpatientbyname", isAuthorized, getPatientByName);
-router.put("/updatepatient/:id", isPatient, updatePatientDetails);
+router.patch("/updatepatient/:id", isPatient, updatePatientDetails);
 
 export default router;

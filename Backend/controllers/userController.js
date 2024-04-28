@@ -89,17 +89,17 @@ export const login = catchAsyncError(async (req, res, next) => {
   } else if (UserRole === "Admin") {
     try {
       const user = await Admins.findOne({
-        where: { Email: Email } && { Passwordd: Passwordd },
+        where: { Email: Email },
       });
       if (!user) {
         return next(new ErrorHandler("Invalid email or password", 401));
       }
 
-      //const passwordMatch = bcrypt.compareSync(Passwordd, user.Passwordd);
+      const passwordMatch = bcrypt.compareSync(Passwordd, user.Passwordd);
 
-      // if (!passwordMatch) {
-      //   return next(new ErrorHandler("Invalid email or password", 401));
-      // }
+      if (!passwordMatch) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+      }
       sendToken(user, 200, res, "Admin Login Successfully");
     } catch (error) {
       return next(new ErrorHandler("Error logging in", 500));

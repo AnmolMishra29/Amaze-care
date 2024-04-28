@@ -10,10 +10,16 @@ import {
 } from "../controllers/appointmentController.js";
 
 import { isAuthorized, isDoctor, isPatient } from "../middlewares/auth.js";
+import { appointmentDataValidate } from "../middlewares/validation.js";
 
 const router = express.Router();
 
-router.post("/createappointment", isPatient, createAppointment);
+router.post(
+  "/createappointment",
+  isPatient,
+  appointmentDataValidate,
+  createAppointment
+);
 router.get("/getallappointment", isAuthorized, getAllAppointments);
 router.get(
   "/getappointmentbydoctorid/:id",

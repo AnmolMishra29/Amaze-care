@@ -2,17 +2,13 @@ import jwt from "jsonwebtoken";
 
 export const sendToken = (user, statusCode, res, message) => {
   let token = "";
-  user.UserRole === "Patient"
-    ? (token = getJWTTokenforPatient(user.PatientID, user.Email))
-    : user.UserRole === "Doctor"
-    ? (token = getJWTTokenforDoctor(user.DoctorID, user.Email))
-    : getJWTTokenforAdmin(user.AdminID, user.Email);
-  // if (user.UserRole === "Patient") {
-  //   token = getJWTTokenforPatient(user.PatientID, user.Email);
-  // }
-  // else {
-  //   token = getJWTTokenforDoctor(user.DoctorID, user.Email);
-  // }
+  if (user.UserRole === "Patient") {
+    token = getJWTTokenforPatient(user.PatientID, user.Email);
+  } else if (user.UserRole === "Doctor") {
+    token = getJWTTokenforDoctor(user.DoctorID, user.Email);
+  } else {
+    token = getJWTTokenforAdmin(user.AdminID, user.Email);
+  }
   //const token = getJWTToken(user.DoctorID, user.Email);
   //const token = user.getJWTToken();
   const options = {

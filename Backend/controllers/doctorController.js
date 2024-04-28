@@ -32,6 +32,23 @@ export const getDoctorById = catchAsyncError(async (req, res, next) => {
 
 export const getDoctorByName = catchAsyncError(async (req, res, next) => {});
 
-export const updateDoctorDetails = catchAsyncError(
-  async (req, res, next) => {}
-);
+export const updateDoctorDetails = catchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { Experience, Designation } = req.body;
+
+    const doctor = await Doctors.findByPk(id);
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    doctor.Experience = Experience;
+    doctor.Designation = Designation;
+
+    await doctor.save();
+
+    res.status(200).json({ success: true, doctor });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});

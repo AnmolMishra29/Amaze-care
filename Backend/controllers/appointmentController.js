@@ -96,7 +96,27 @@ export const getAllAppointmentsByPatientID = catchAsyncError(
   }
 );
 
-export const updateAppointment = catchAsyncError(async (req, res, next) => {});
+export const updateAppointment = catchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { AppointmentDate, Symptoms, AppointmentStatus } = req.body;
+
+    const appointment = await Appointments.findByPk(id);
+    if (!appointment) {
+      return res.status(404).json({ error: "Appointment not found" });
+    }
+
+    appointment.AppointmentDate = AppointmentDate;
+    appointment.Symptoms = Symptoms;
+    appointment.AppointmentStatus = AppointmentStatus;
+
+    await appointment.save();
+
+    res.status(200).json({ success: true, appointment });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export const cancelAppointment = catchAsyncError(async (req, res, next) => {
   const appointmentId = req.params.id;

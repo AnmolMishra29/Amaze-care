@@ -6,6 +6,8 @@ import userRouter from "./routers/userRouter.js";
 import appointmentRouter from "./routers/appointmentRouter.js";
 import medicalRecordRouter from "./routers/medicalRecordRouter.js";
 import prescriptionRouter from "./routers/prescriptionRouter.js";
+import patientRouter from "./routers/patientRouter.js";
+import doctorRouter from "./routers/DoctorRouter.js";
 import sequelize from "./database/db.js";
 
 const app = express();
@@ -27,7 +29,8 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/medical", medicalRecordRouter);
 app.use("/api/v1/prescription", prescriptionRouter);
 app.use("/api/v1/appointment", appointmentRouter);
-
+app.use("/api/v1/patient", patientRouter);
+app.use("/api/v1/doctor", doctorRouter);
 try {
   sequelize.authenticate();
   console.log("Database connected Successfully");

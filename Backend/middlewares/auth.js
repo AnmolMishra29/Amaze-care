@@ -19,6 +19,9 @@ export const isAuthorized = catchAsyncError(async (req, res, next) => {
     if (decoded.hasOwnProperty("DoctorID")) {
       req.userId = decoded.DoctorID;
     }
+    if (decoded.hasOwnProperty("AdminID")) {
+      req.userId = decoded.AdminID;
+    }
 
     next();
   });
@@ -38,9 +41,9 @@ export const isDoctor = catchAsyncError(async (req, res, next) => {
     }
 
     if (decoded.UserRole !== "Doctor") {
-      return res
-        .status(403)
-        .json({ error: "Patients are not allowed to use this functionality" });
+      return res.status(403).json({
+        error: "Patients and Admin are not allowed to use this functionality",
+      });
     }
 
     req.userId = decoded.userId;
@@ -62,9 +65,9 @@ export const isPatient = catchAsyncError(async (req, res, next) => {
     }
 
     if (decoded.UserRole !== "Patient") {
-      return res
-        .status(403)
-        .json({ error: "Doctors are not allowed to use this functionality" });
+      return res.status(403).json({
+        error: "Doctors and Admins are not allowed to use this functionality",
+      });
     }
 
     req.userId = decoded.userId;
@@ -85,13 +88,10 @@ export const isAdmin = catchAsyncError(async (req, res, next) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    if (decoded.UserRole === "Patient" || decoded.UserRole === "Doctor") {
-      return res
-        .status(403)
-        .json({
-          error:
-            "Doctors and Patients are not allowed to use this functionality",
-        });
+    if (decoded.UserRole !== "Admin") {
+      return res.status(403).json({
+        error: "Doctors and Patients are not allowed to use this functionality",
+      });
     }
 
     req.userId = decoded.userId;

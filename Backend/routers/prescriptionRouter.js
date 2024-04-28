@@ -9,10 +9,16 @@ import {
 } from "../controllers/prescriptionController.js";
 
 import { isAuthorized, isDoctor } from "../middlewares/auth.js";
+import { prescriptionDataValidate } from "../middlewares/validation.js";
 
 const router = express.Router();
 
-router.post("/createprescription", isDoctor, createPrescription);
+router.post(
+  "/createprescription",
+  isDoctor,
+  prescriptionDataValidate,
+  createPrescription
+);
 router.get("/getallprescription", isAuthorized, getAllPrescription);
 router.get("/getprescription/:id", isAuthorized, getAllPrescriptionByID);
 router.get(

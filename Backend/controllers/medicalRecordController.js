@@ -149,9 +149,33 @@ export const getMedicalRecordByAppointmentID = catchAsyncError(
   }
 );
 
-export const updateMedicalRecord = catchAsyncError(
-  async (req, res, next) => {}
-);
+export const updateMedicalRecord = catchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      CurrentSymptoms,
+      PhysicalExamination,
+      TreatmentPlan,
+      RecommendedTests,
+    } = req.body;
+
+    const record = await Records.findByPk(id);
+    if (!record) {
+      return res.status(404).json({ error: "Record not found" });
+    }
+
+    record.CurrentSymptoms = CurrentSymptoms;
+    record.PhysicalExamination = PhysicalExamination;
+    record.TreatmentPlan = TreatmentPlan;
+    record.RecommendedTests = RecommendedTests;
+
+    await record.save();
+
+    res.status(200).json({ success: true, record });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export const deleteMedicalRecordbyId = catchAsyncError(
   async (req, res, next) => {

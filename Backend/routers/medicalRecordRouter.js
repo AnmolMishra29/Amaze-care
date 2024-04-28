@@ -11,10 +11,16 @@ import {
 } from "../controllers/medicalRecordController.js";
 
 import { isAuthorized, isDoctor, isPatient } from "../middlewares/auth.js";
+import { medicalRecordDataValidate } from "../middlewares/validation.js";
 
 const router = express.Router();
 
-router.post("/createrecord", isDoctor, createMedicalRecord);
+router.post(
+  "/createrecord",
+  isDoctor,
+  medicalRecordDataValidate,
+  createMedicalRecord
+);
 router.get("/getallrecord", isAuthorized, getAllMedicalRecord);
 router.get("/getrecordbyid/:id", isAuthorized, getMedicalRecordByID);
 router.get(

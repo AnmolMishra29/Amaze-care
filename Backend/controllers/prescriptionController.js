@@ -75,7 +75,27 @@ export const getAllPrescriptionByRecordID = catchAsyncError(
   }
 );
 
-export const updatePrescription = catchAsyncError(async (req, res, next) => {});
+export const updatePrescription = catchAsyncError(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { Medicine, Instructions, Dosage } = req.body;
+
+    const prescription = await Prescriptions.findByPk(id);
+    if (!prescription) {
+      return res.status(404).json({ error: "Prescription not found" });
+    }
+
+    prescription.Medicine = Medicine;
+    prescription.Instructions = Instructions;
+    prescription.Dosage = Dosage;
+
+    await prescription.save();
+
+    res.status(200).json({ success: true, prescription });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 export const deletePrescription = catchAsyncError(async (req, res, next) => {
   const prescriptionId = req.params.id;
