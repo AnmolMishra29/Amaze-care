@@ -1,5 +1,6 @@
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import Prescriptions from "../models/prescriptionModel.js";
+import logger from "../utils/logger.js";
 
 export const createPrescription = catchAsyncError(async (req, res, next) => {
   const { RecordID, Medicine, Instructions, Dosage } = req.body;
@@ -12,14 +13,15 @@ export const createPrescription = catchAsyncError(async (req, res, next) => {
       Instructions: Instructions,
       Dosage: Dosage,
     });
-
+    logger.info("New prescription created :", newPrescription);
     res.status(200).json({
       success: true,
       message: "Prescription created successfully",
       newPrescription,
     });
   } catch (error) {
-    console.error("Error inserting Prescription:", error);
+    logger.error("Error in creating prescription:", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
@@ -27,8 +29,17 @@ export const getAllPrescription = catchAsyncError(async (req, res, next) => {
   try {
     const allPrescriptions = await Prescriptions.findAll();
 
+    if (!allPrescriptions) {
+      logger.info("No prescription found ");
+      return res
+        .status(404)
+        .json({ success: false, error: "prescription not found" });
+    }
+
+    logger.info("All Prescriptions :", allPrescriptions);
     res.status(200).json({ success: true, Prescriptions: allPrescriptions });
   } catch (error) {
+    logger.error("Error in fetching all prescriptions :", error);
     res
       .status(500)
       .json({ success: false, error: "Error fetching Prescriptions", error });
@@ -43,12 +54,15 @@ export const getAllPrescriptionByID = catchAsyncError(
       const prescription = await Prescriptions.findByPk(prescriptionId);
 
       if (!prescription) {
+        logger.info("No Prescription found");
         return res
           .status(404)
           .json({ success: false, error: "prescription not found" });
       }
+      logger.info("Prescription by ID :", prescription);
       res.status(200).json({ success: true, Prescriptions: prescription });
     } catch (error) {
+      logger.error("Error in fetching prescrption:", error);
       res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   }
@@ -64,12 +78,18 @@ export const getAllPrescriptionByRecordID = catchAsyncError(
       });
 
       if (!prescription) {
+        logger.info("No Prescription found");
         return res
           .status(404)
           .json({ success: false, error: "prescription not found" });
       }
+      logger.info("All Prescription by Medical record :", prescription);
       res.status(200).json({ success: true, prescription });
     } catch (error) {
+      logger.error(
+        "Error in fetching prescription by medical record ID:",
+        error
+      );
       res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   }
@@ -82,6 +102,7 @@ export const updatePrescription = catchAsyncError(async (req, res, next) => {
 
     const prescription = await Prescriptions.findByPk(id);
     if (!prescription) {
+      logger.info("No Prescription found");
       return res.status(404).json({ error: "Prescription not found" });
     }
 
@@ -90,9 +111,10 @@ export const updatePrescription = catchAsyncError(async (req, res, next) => {
     prescription.Dosage = Dosage;
 
     await prescription.save();
-
+    logger.info("Prescription updated succesfully :", prescription);
     res.status(200).json({ success: true, prescription });
   } catch (error) {
+    logger.error("Error in updating prescription :", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -104,17 +126,19 @@ export const deletePrescription = catchAsyncError(async (req, res, next) => {
     const prescription = await Prescriptions.findByPk(prescriptionId);
 
     if (!prescription) {
+      logger.info("No Prescription found");
       return res
         .status(404)
         .json({ success: false, error: "Prescription not found" });
     }
 
     await prescription.destroy();
+    logger.info("Prescription deleted successfully:", prescription);
     res
       .status(200)
       .json({ success: true, message: "Prescription deleted succesfully" });
   } catch (error) {
-    console.log(error);
+    logger.error("Error in deleting prescription :", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });

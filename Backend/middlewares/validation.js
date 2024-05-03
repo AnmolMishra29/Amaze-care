@@ -1,10 +1,14 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
 export const patientDataValidate = [
   body("PatientName")
     .exists({ checkFalsy: true })
     .withMessage("Patient Name is required"),
-  body("Age").exists({ checkFalsy: true }).withMessage("Age is required"),
+  body("Age")
+    .exists({ checkFalsy: true })
+    .withMessage("Age is required")
+    .isInt()
+    .withMessage("Age should be a number"),
   body("Gender").exists({ checkFalsy: true }).withMessage("Gender is required"),
   body("ContactNumber")
     .exists({ checkFalsy: true })
@@ -35,7 +39,9 @@ export const doctorDataValidate = [
     .withMessage("Speciality is required"),
   body("Experience")
     .exists({ checkFalsy: true })
-    .withMessage("Experience is required"),
+    .withMessage("Experience is required")
+    .isInt()
+    .withMessage("Experience should be a number"),
   body("Qualification")
     .exists({ checkFalsy: true })
     .withMessage("Qualification is required"),
@@ -59,7 +65,9 @@ export const doctorDataValidate = [
 export const prescriptionDataValidate = [
   body("RecordID")
     .exists({ checkFalsy: true })
-    .withMessage("Record ID is required"),
+    .withMessage("Record ID is required")
+    .isInt()
+    .withMessage("RecordID should be a number"),
   body("Medicine")
     .exists({ checkFalsy: true })
     .withMessage("Medicine is required"),
@@ -83,15 +91,21 @@ export const medicalRecordDataValidate = [
     .withMessage("RecommendedTests is required"),
   body("AppointmentID")
     .exists({ checkFalsy: true })
-    .withMessage("AppointmentID is required"),
+    .withMessage("AppointmentID is required")
+    .isInt()
+    .withMessage("AppointmentID should be a number"),
 ];
 export const appointmentDataValidate = [
   body("DoctorID")
     .exists({ checkFalsy: true })
-    .withMessage("Doctor ID is required"),
+    .withMessage("Doctor ID is required")
+    .isInt()
+    .withMessage("DoctorID should be a numbner"),
   body("PatientID")
     .exists({ checkFalsy: true })
-    .withMessage("PatientID is required"),
+    .withMessage("PatientID is required")
+    .isInt()
+    .withMessage("PatientID should be a number"),
   body("AppointmentDate")
     .exists({ checkFalsy: true })
     .withMessage("AppointmentDate is required"),

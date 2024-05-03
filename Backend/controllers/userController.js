@@ -5,6 +5,7 @@ import Doctors from "../models/doctorModel.js";
 import bcrypt from "bcrypt";
 import { sendToken } from "../utils/jwtToken.js";
 import Admins from "../models/adminModel.js";
+import logger from "../utils/logger.js";
 
 export const patientregister = catchAsyncError(async (req, res, next) => {
   const {
@@ -28,11 +29,12 @@ export const patientregister = catchAsyncError(async (req, res, next) => {
       Passwordd: hashedPassword,
       UserRole: UserRole,
     });
-
-    console.log("Patient inserted successfully:", user.toJSON());
+    logger.info("Patient inserted:", user);
     sendToken(user, 200, res, "Patient Registered Successfully");
   } catch (error) {
-    console.error("Error adding patient:", error);
+    logger.error("Error inserting patient :", error);
+    //console.error("Error adding patient:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -60,11 +62,11 @@ export const doctorregister = catchAsyncError(async (req, res, next) => {
       UserRole: UserRole,
       Passwordd: hashedPassword,
     });
-
-    console.log("Doctor inserted successfully:", user.toJSON());
+    logger.info("Doctor inserted:", user);
     sendToken(user, 200, res, "Doctor Registered Successfully");
   } catch (error) {
-    console.error("Error adding doctor:", error);
+    logger.error("Error inserting doctor", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -82,8 +84,10 @@ export const login = catchAsyncError(async (req, res, next) => {
       if (!passwordMatch) {
         return next(new ErrorHandler("Invalid email or password", 401));
       }
+      logger.info("Patient Login successfully:", user);
       sendToken(user, 200, res, "Patient Login Successfully");
     } catch (error) {
+      logger.error("Error in login of patient :", error);
       return next(new ErrorHandler("Error logging in", 500));
     }
   } else if (UserRole === "Admin") {
@@ -100,8 +104,10 @@ export const login = catchAsyncError(async (req, res, next) => {
       if (!passwordMatch) {
         return next(new ErrorHandler("Invalid email or password", 401));
       }
+      logger.info("Admin Login successfully:", user);
       sendToken(user, 200, res, "Admin Login Successfully");
     } catch (error) {
+      logger.error("Error in login of Admin :", error);
       return next(new ErrorHandler("Error logging in", 500));
     }
   } else {
@@ -116,8 +122,10 @@ export const login = catchAsyncError(async (req, res, next) => {
       if (!passwordMatch) {
         return next(new ErrorHandler("Invalid email or password", 401));
       }
+      logger.info("Doctor Login successfully:", user);
       sendToken(user, 200, res, "Doctor Login Successfully");
     } catch (error) {
+      logger.error("Error in login of Doctor :", error);
       return next(new ErrorHandler("Error logging in", 500));
     }
   }
@@ -148,9 +156,10 @@ export const adminregister = catchAsyncError(async (req, res, next) => {
       Passwordd: hashedPassword,
     });
 
-    console.log("Admin inserted successfully:", user.toJSON());
+    logger.info("Admin inserted successfully:", user);
     sendToken(user, 200, res, "Admin Registered Successfully");
   } catch (error) {
-    console.error("Error adding Admin:", error);
+    logger.error("Error in regstering  admin:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });

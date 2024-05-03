@@ -7,6 +7,8 @@ import {
   getAllAppointmentsByDoctorID,
   getAllAppointmentsByPatientID,
   updateAppointment,
+  updateAppointmentStatus,
+  updateAppointmentDateandTime,
 } from "../controllers/appointmentController.js";
 
 import { isAuthorized, isDoctor, isPatient } from "../middlewares/auth.js";
@@ -33,6 +35,12 @@ router.get(
 );
 router.get("/getappointmentbyid/:id", isAuthorized, getAppointmentByID);
 router.put("/updateappointment/:id", isPatient, updateAppointment);
+router.put("/updateappointmentstatus/:id", isPatient, updateAppointmentStatus);
+router.put(
+  "/updateappointmentdate/:id",
+  isPatient,
+  updateAppointmentDateandTime
+);
 router.delete("/cancelappointment/:id", isPatient, cancelAppointment);
 
 export default router;
